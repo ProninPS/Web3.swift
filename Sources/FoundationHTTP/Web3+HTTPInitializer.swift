@@ -18,4 +18,15 @@ public extension Web3 {
     init(rpcURL: String, rpcId: Int = 1) {
         self.init(provider: Web3HttpProvider(rpcURL: rpcURL), rpcId: rpcId)
     }
+
+    /**
+     * Initializes a new instance of `Web3` with the HTTP RPC interface, allowing custom HTTP headers.
+     *
+     * - parameter rpcURL: The URL of the HTTP RPC API.
+     * - parameter headers: Additional HTTP headers to include in every request.
+     * - parameter rpcId: The rpc id to be used in all requests. Defaults to 1.
+     */
+    init(rpcURL: String, headers: [String: String], rpcId: Int = 1) {
+        self.init(provider: Web3HttpProvider(rpcURL: rpcURL, headers: headers), rpcId: rpcId)
+    }
 }

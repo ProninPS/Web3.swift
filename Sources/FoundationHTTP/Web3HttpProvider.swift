@@ -20,16 +20,18 @@ public struct Web3HttpProvider: Web3Provider {
 
     let session: URLSession
 
-    static let headers = [
+    static let defaultHeaders = [
         "Accept": "application/json",
         "Content-Type": "application/json"
     ]
 
     public let rpcURL: String
+    private let additionalHeaders: [String: String]
 
-    public init(rpcURL: String, session: URLSession = URLSession(configuration: .default)) {
+    public init(rpcURL: String, session: URLSession = URLSession(configuration: .default), headers: [String: String] = [:]) {
         self.rpcURL = rpcURL
         self.session = session
+        self.additionalHeaders = headers
         // Concurrent queue for faster concurrent requests
         self.queue = DispatchQueue(label: "Web3HttpProvider", attributes: .concurrent)
     }
@@ -55,8 +57,13 @@ public struct Web3HttpProvider: Web3Provider {
             var req = URLRequest(url: url)
             req.httpMethod = "POST"
             req.httpBody = body
-            for (k, v) in type(of: self).headers {
+            // apply default headers first
+            for (k, v) in type(of: self).defaultHeaders {
                 req.addValue(v, forHTTPHeaderField: k)
+            }
+            // then apply/override with any additional headers
+            for (k, v) in self.additionalHeaders {
+                req.setValue(v, forHTTPHeaderField: k)
             }
 
             let task = self.session.dataTask(with: req) { data, urlResponse, error in
